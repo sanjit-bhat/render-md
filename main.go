@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -29,31 +30,27 @@ const htmlTemplate = `<!DOCTYPE html>
 func main() {
 	input, output, err := parseArgs(os.Args[1:])
 	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
+		log.Fatal(err)
 	}
 
 	contents, err := os.ReadFile(input)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "error reading %s: %v\n", input, err)
-		os.Exit(1)
+		log.Fatalf("error reading %s: %v", input, err)
 	}
 
 	fragment, err := renderMarkdown(string(contents))
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "error rendering markdown: %v\n", err)
-		os.Exit(1)
+		log.Fatalf("error rendering markdown: %v", err)
 	}
 
 	title := strings.TrimSuffix(filepath.Base(input), filepath.Ext(input))
 	html := fmt.Sprintf(htmlTemplate, title, fragment)
 
 	if err := os.WriteFile(output, []byte(html), 0644); err != nil {
-		fmt.Fprintf(os.Stderr, "error writing %s: %v\n", output, err)
-		os.Exit(1)
+		log.Fatalf("error writing %s: %v", output, err)
 	}
 
-	fmt.Println(output)
+	fmt.Println("wrote output to", output)
 }
 
 func parseArgs(args []string) (input, output string, err error) {
