@@ -18,10 +18,10 @@ jobs:
         run: go vet ./...
 
       - name: fmt
-        run: test -z "$(gofmt -l .)"
+        run: gofmt -w -s . && git diff --exit-code
 
       - name: fix
-        run: go fix ./...
+        run: go fix ./... && git diff --exit-code
 
       - name: test
         run: go test ./...
